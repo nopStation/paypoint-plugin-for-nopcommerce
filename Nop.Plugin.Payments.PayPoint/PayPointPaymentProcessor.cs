@@ -16,6 +16,7 @@ using Nop.Services.Directory;
 using Nop.Services.Localization;
 using Nop.Services.Logging;
 using Nop.Services.Payments;
+using Nop.Services.Orders;
 
 namespace Nop.Plugin.Payments.PayPoint
 {
@@ -31,11 +32,11 @@ namespace Nop.Plugin.Payments.PayPoint
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILocalizationService _localizationService;
         private readonly ILogger _logger;
-        private readonly IPaymentService _paymentService;
         private readonly ISettingService _settingService;
         private readonly IWebHelper _webHelper;
         private readonly IWorkContext _workContext;
         private readonly PayPointPaymentSettings _payPointPaymentSettings;
+        private readonly IOrderTotalCalculationService _orderTotalCalculationService;
 
         #endregion
 
@@ -46,22 +47,22 @@ namespace Nop.Plugin.Payments.PayPoint
             IHttpContextAccessor httpContextAccessor,
             ILocalizationService localizationService,
             ILogger logger,
-            IPaymentService paymentService,
             ISettingService settingService,
             IWebHelper webHelper,
             IWorkContext workContext,
-            PayPointPaymentSettings payPointPaymentSettings)
+            PayPointPaymentSettings payPointPaymentSettings, 
+            IOrderTotalCalculationService orderTotalCalculationService)
         {
             this._currencySettings = currencySettings;
             this._currencyService = currencyService;
             this._httpContextAccessor = httpContextAccessor;
             this._localizationService = localizationService;
             this._logger = logger;
-            this._paymentService = paymentService;
             this._settingService = settingService;
             this._webHelper = webHelper;
             this._workContext = workContext;
             this._payPointPaymentSettings = payPointPaymentSettings;
+            _orderTotalCalculationService = orderTotalCalculationService;
         }
 
         #endregion
@@ -191,7 +192,7 @@ namespace Nop.Plugin.Payments.PayPoint
         /// <returns>Additional handling fee</returns>
         public async Task<decimal> GetAdditionalHandlingFeeAsync(IList<ShoppingCartItem> cart)
         {
-            var result = await _paymentService.CalculateAdditionalFeeAsync(cart,
+            var result = await _orderTotalCalculationService.CalculatePaymentAdditionalFeeAsync(cart,
                 _payPointPaymentSettings.AdditionalFee, _payPointPaymentSettings.AdditionalFeePercentage);
 
             return result;

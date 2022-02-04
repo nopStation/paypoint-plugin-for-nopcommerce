@@ -18,7 +18,6 @@ using Nop.Web.Framework.Mvc.Filters;
 
 namespace Nop.Plugin.Payments.PayPoint.Controllers
 {
-    
     public class PaymentPayPointController : BasePaymentController
     {
         #region Fields
